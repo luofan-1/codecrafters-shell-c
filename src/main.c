@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
   // TODO: Uncomment the code below to pass the first stage
   printf("$ ");
   char buff[256];
-  fgets(buff, sizeof(buff), stderr);
+  fgets(buff, sizeof(buff), stdin);
   printf("%s: command not found\n", buff);
   return 0;
 }
