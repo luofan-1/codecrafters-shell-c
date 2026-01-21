@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     printf("$ ");
     fgets(cmd_buff, sizeof(cmd_buff), stdin);
     cmd_buff[strlen(cmd_buff)-1] = '\0';
-    if (strcmp(cmd_buff, "exit")) {
+    if (strcmp(cmd_buff, "exit") == 0) {
       builtin_exit();
     } else {
       printf("%s: command not found\n", cmd_buff);
