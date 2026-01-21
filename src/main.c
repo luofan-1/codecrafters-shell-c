@@ -6,11 +6,14 @@ int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
 
-  // TODO: Uncomment the code below to pass the first stage
-  printf("$ ");
-  char buff[256];
-  fgets(buff, sizeof(buff), stdin);
-  buff[strlen(buff)-1] = '\0';
-  printf("%s: command not found\n", buff);
+  char cmd_buff[256];
+  
+  while (1) {
+    printf("$ ");
+    fgets(cmd_buff, sizeof(cmd_buff), stdin);
+    cmd_buff[strlen(cmd_buff)-1] = '\0';
+    printf("%s: command not found\n", cmd_buff);
+  }
+  
   return 0;
 }
