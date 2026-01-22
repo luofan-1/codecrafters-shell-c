@@ -13,6 +13,7 @@ char *builtin_type(const char *args) {
     int idx = get_idx(args);
     if (idx != -1) {
         printf("%s is a shell builtin\n", args);
+        return NULL;
     }
     
     // 在环境变量 Path 中查找
@@ -26,7 +27,7 @@ char *builtin_type(const char *args) {
             sprintf(full_path, "%s/%s", dir, args);
         #endif
 
-        if (access(full_path, X_OK)) {
+        if (access(full_path, X_OK) == 0) {
             free(path_copy);
             printf("%s is %s\n", args, full_path);
             return NULL;
