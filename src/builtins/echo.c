@@ -1,4 +1,4 @@
-#include "command_lib.h"
+#include "../command_lib.h"
 #include <stdio.h>
 
 char *builtin_echo(const char *content) {

@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]) {
     // Flush after every printf
+    ENV_PATH = getenv("PATH");
     setbuf(stdout, NULL);
-
     char cmd_buff[256];
 
 #ifndef NDEBUG

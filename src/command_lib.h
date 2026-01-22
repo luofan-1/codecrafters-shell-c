@@ -3,7 +3,12 @@
 
 #define NDEBUG
 
+#include <stdlib.h>
 #include <stdnoreturn.h>
+
+
+extern const char *ENV_PATH;
+extern const char *PATH_LIST_SEPARATOR; 
 
 // 感觉以后用树或者哈希表什么的来替代线性查找会更好一点
 #define CMD_LINK(X) \
