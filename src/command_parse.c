@@ -14,8 +14,8 @@ int command_parse(const char *cmd) {
 #endif
 
         if (strstr(cmd, cmd_lib[i]) == cmd) {
-            #define X(cstr, cidx, cfunc) \
-                case cidx: cfunc(cmd+strlen(cmd_lib[i])); break;
+            #define X(name, idx, func) \
+                case idx: func(cmd+strlen(cmd_lib[i])); break;
             switch (i) {
                 CMD_FUNC(X)
                 // default: invalid_info(cmd); return 0; break;
