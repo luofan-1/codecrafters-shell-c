@@ -1,7 +1,7 @@
 #include "../command_lib.h"
 #include <stdio.h>
 
-void builtin_echo(const char *content) {
-    if (content[0] == ' ') content ++;
+char *builtin_echo(const char *content) {
     printf("%s\n", content);
+    return NULL;
 }

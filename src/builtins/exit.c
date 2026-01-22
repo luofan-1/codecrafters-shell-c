@@ -2,6 +2,7 @@
 #include <stdnoreturn.h>
 #include <stdlib.h>
 
-_Noreturn void builtin_exit(const char *args) {
+char *builtin_exit(const char *args) {
     exit(EXIT_SUCCESS);
+    return NULL; // 无意义
 }
