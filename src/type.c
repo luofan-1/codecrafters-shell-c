@@ -1,4 +1,4 @@
-#include "../command_lib.h"
+#include "command_lib.h"
 #include <assert.h>
 #include <stdio.h>
 // #include <stdlib.h>
