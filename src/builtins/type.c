@@ -1,6 +1,6 @@
 #include "../command_lib.h"
 #include <assert.h>
-#include <io.h>
+// #include <io.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,7 +25,7 @@ char *builtin_type(const char *args) {
         #else
             sprintf(full_path, "%s/%s", dir, args);
         #endif
-        
+
         if (access(full_path, X_OK)) {
             free(path_copy);
             printf("%s is %s\n", args, full_path);
