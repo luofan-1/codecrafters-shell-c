@@ -51,7 +51,10 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-build
 vcpkg_installed
-src/temp/
-src/temp
+
+build
+temp/
+make/
+make
+make/*

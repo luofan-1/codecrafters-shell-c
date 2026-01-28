@@ -1,4 +1,8 @@
-#include "../command_lib.h"
+/**
+ * builtin exit
+ */
+
+#include "command_lib.h"
 #include <stdnoreturn.h>
 #include <stdlib.h>
 

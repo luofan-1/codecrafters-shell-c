@@ -1,12 +1,28 @@
 #include "command_lib.h"
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
+// get command index
 int get_idx(const char *cmd) {
-    for (int i=0; i<CMDCNT; i++)
-        if (strstr(cmd, cmd_lib[i]) == cmd) return i;
+    char nextch;
+    for (int i=0; i<BUILTIN_CNT; i++) {
+        nextch = *(cmd+strlen(cmd_lib[i]));
+        if (strstr(cmd, cmd_lib[i])==cmd && (nextch==' '||nextch=='\0')) return i;
+    }
     return -1;
+}
+
+// 简直依托
+const char *get_idx_and_move(const char *cmd, int *idx_reciever) {
+    *idx_reciever = get_idx(cmd);
+    if (*idx_reciever==-1) return NULL;
+    if (*(cmd+strlen(cmd_lib[*idx_reciever]))==' ') {
+        return cmd+strlen(cmd_lib[*idx_reciever])+1;
+    } else {
+        return cmd+strlen(cmd_lib[*idx_reciever]);
+    }
 }
 
 void invalid_info(const char *cmd) {
@@ -15,16 +31,33 @@ void invalid_info(const char *cmd) {
 
 int command_parse(const char *cmd) {
     assert(cmd!=NULL);
-    int cmd_idx = get_idx(cmd);
+    // int cmd_idx = get_idx(cmd);
+    // // builtins
+    // // 这里要改成get idx and move吗
+    // if (cmd_idx != -1) {
+    //     const char *args = cmd+strlen(cmd_lib[cmd_idx]);
+    //     if (args[0] == ' ') {
+    //         (void)(cmd_funcs[cmd_idx])(args+1);
+    //     } else if (args[0]=='\0') {
+    //         (void)(cmd_funcs[cmd_idx])(args);
+    //     } else {
+    //         goto fail;
+    //     }
+    //     return 1;
+    // }
+
+    // -------------------新增---------------------
+    int cmd_idx;
+    const char *args = get_idx_and_move(cmd, &cmd_idx);
     if (cmd_idx != -1) {
-        const char *args = cmd+strlen(cmd_lib[cmd_idx]);
-        if (args[0] == ' ') {
-            (void)(cmd_funcs[cmd_idx])(args+1);
-        } else if (args[0]=='\0') {
-            (void)(cmd_funcs[cmd_idx])(args);
-        } else {
-            goto fail;
-        }
+        (void)(cmd_funcs[cmd_idx])(args);
+        return 1;
+    }
+    // -------------------新增---------------------
+
+    char *path;
+    if (search_external(cmd, &path)) {
+        system(cmd);
         return 1;
     }
 

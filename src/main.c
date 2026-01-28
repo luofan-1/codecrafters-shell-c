@@ -9,7 +9,8 @@ int main(int argc, char *argv[]) {
     char cmd_buff[256];
 
 #ifndef NDEBUG
-    printf("CMDCNT = %d\n", CMDCNT);
+    printf("PATH = %s\n", ENV_PATH);
+    printf("BUILTIN_CNT = %zu\n", BUILTIN_CNT);
 #endif
 
     while (1) {
