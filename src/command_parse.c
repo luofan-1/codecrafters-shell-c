@@ -80,7 +80,9 @@ int command_parse(const char *cmd) {
 
     
     if (!search_external(tokens[0], NULL)) {
-        goto fail;
+        // goto fail;
+        invalid_info(tokens[0]);
+        return 0;
     }
 
     #ifdef __WIN32
@@ -91,13 +93,14 @@ int command_parse(const char *cmd) {
         if (fork() == 0) {
             execvp(tokens[0], tokens);
             // printf("");
-            goto fail;
+            // goto fail;
+            exit(1);
         }
         wait(&fork_ret);
     #endif
     
-fail:
-    invalid_info(tokens[0]);
+// fail:
+    // invalid_info(tokens[0]);
 
-    return 0;
+    return 1;
 }
