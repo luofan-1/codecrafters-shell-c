@@ -7,7 +7,13 @@ char *builtin_cd(const char *args) {
     // chdir 在 windows 下依然是用不了的
     int ret;
     if (strcmp(args, "~") == 0) {
-        ret = chdir("/home");    
+        const char *home;
+        #ifdef _WIN32
+            home = getenv("USERPROFILE");
+        #else
+            home = getenv("HOME");
+        #endif
+        ret = chdir(home);    
     } else {
         ret = chdir(args);
     }
