@@ -4,10 +4,17 @@
 
 char *builtin_cd(const char *args) {
     // chdir 在 windows 下依然是用不了的
-    int ret = chdir(args);
+    int ret;
+    if (strcmp(args, "~") == 0) {
+        ret = chdir("/home");    
+    } else {
+        ret = chdir(args);
+    }
     if (ret == -1) {
         printf("cd: %s: No such file or directory\n", args);
     }
+
+    // printf("cd: %s: No such file or directory\n", args);
     return NULL;
 }
 
