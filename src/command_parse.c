@@ -34,8 +34,12 @@ void invalid_info(const char *cmd) {
     printf("%s: command not found\n", cmd);
 }
 
+/**
+ * @return 成功则返回1, 失败则返回0
+ */
 int command_parse(const char *cmd) {
     assert(cmd!=NULL);
+    
     // int cmd_idx = get_idx(cmd);
     // // builtins
     // // 这里要改成get idx and move吗
@@ -80,7 +84,6 @@ int command_parse(const char *cmd) {
 
     
     if (!search_external(tokens[0], NULL)) {
-        // goto fail;
         invalid_info(tokens[0]);
         return 0;
     }
@@ -92,15 +95,10 @@ int command_parse(const char *cmd) {
         int fork_ret;
         if (fork() == 0) {
             execvp(tokens[0], tokens);
-            // printf("");
-            // goto fail;
             exit(1);
         }
         wait(&fork_ret);
     #endif
     
-// fail:
-    // invalid_info(tokens[0]);
-
     return 1;
 }
