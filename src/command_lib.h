@@ -16,7 +16,8 @@ extern const char *PATH_LIST_SEPARATOR;
     X("exit", 0, builtin_exit) \
     X("echo", 1, builtin_echo) \
     X("type", 2, builtin_type) \
-    X("pwd",  3, builtin_pwd)
+    X("pwd",  3, builtin_pwd ) \
+    X("cd",   4, builtin_cd  )
 
 
 // 命令列表(有点想把这个东西搞到外部去，这样以后添加命令会不会更方便一点？)
@@ -44,6 +45,9 @@ extern char *builtin_type(const char *args);
 
 // pwd
 extern char *builtin_pwd(const char *args);
+
+// cd
+extern char *builtin_cd(const char *args);
 
 // 解析我觉得还是要靠一个定的字符指针和偏移量，以后改改
 // parse
