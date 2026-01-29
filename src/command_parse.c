@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef _WIN32
+#include <unistd.h>
+#include <sys/wait.h>
+#endif
+
 // get command index
 int get_idx(const char *cmd) {
     char nextch;
@@ -14,7 +19,7 @@ int get_idx(const char *cmd) {
     return -1;
 }
 
-// 简直依托
+// ...
 const char *get_idx_and_move(const char *cmd, int *idx_reciever) {
     *idx_reciever = get_idx(cmd);
     if (*idx_reciever==-1) return NULL;
@@ -55,13 +60,29 @@ int command_parse(const char *cmd) {
     }
     // -------------------新增---------------------
 
-    char *path;
-    if (search_external(cmd, &path)) {
-        system(cmd);
-        return 1;
-    }
+//     char *path;
+//     if (search_external(cmd, &path)) {
+//         system(cmd);
+//         return 1;
+//     }
+    
+// fail:
+//     invalid_info(cmd);
 
-fail:
-    invalid_info(cmd);
+    #ifdef __WIN32
+        // 待改进
+        system(cmd);
+    #else
+        int fork_ret;
+        if (fork() == 0) {
+            execlp(cmd, NULL);
+            // printf("");
+            invalid_info(cmd);
+            exit(1);
+        }
+        wait(&fork_ret);
+    #endif
+    
+    
     return 0;
 }
