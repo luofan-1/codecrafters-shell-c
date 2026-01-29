@@ -1,6 +1,5 @@
 #include "command_lib.h"
 #include <assert.h>
-#include <cstddef>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,14 +68,19 @@ int command_parse(const char *cmd) {
     
 // fail:
 //     invalid_info(cmd);
-
     
+
     char *tokens[64];
     char *cmd_copy = strdup(cmd);
     tokens[0] = strtok(cmd_copy, " ");
     int tok_cnt = 1;
     while (tokens[tok_cnt-1]!=NULL && tok_cnt<=64) {
         tokens[tok_cnt++] = strtok(NULL, " ");
+    }
+
+    
+    if (!search_external(tokens[0], NULL)) {
+        goto fail;
     }
 
     #ifdef __WIN32
@@ -87,12 +91,13 @@ int command_parse(const char *cmd) {
         if (fork() == 0) {
             execvp(tokens[0], tokens);
             // printf("");
-            invalid_info(cmd);
-            exit(1);
+            goto fail;
         }
         wait(&fork_ret);
     #endif
     
-    
+fail:
+    invalid_info(tokens[0]);
+
     return 0;
 }

@@ -27,7 +27,7 @@
 int search_external(const char *cmd, char **cmd_path) {
     char *path_copy = strdup(ENV_PATH);
     char *dir = strtok(path_copy, PATH_LIST_SEPARATOR);
-    char *full_path;
+    char *full_path = NULL;
     while (dir != NULL) {
         if (dir[strlen(dir)-1] == PATH_SEPARATOR[0]) {
             if (full_path == NULL) {
@@ -53,7 +53,7 @@ int search_external(const char *cmd, char **cmd_path) {
         if (access(full_path, X_OK) == 0) {
             free(path_copy);
             // printf("%s is %s\n", cmd, full_path);
-            *cmd_path = full_path;
+            if (cmd_path != NULL) *cmd_path = full_path;
             return 1;
         } 
         // else {
@@ -65,7 +65,9 @@ int search_external(const char *cmd, char **cmd_path) {
         dir = strtok(NULL, PATH_LIST_SEPARATOR);
     }
     free(path_copy);
-    free(full_path);
+    if (full_path != NULL) {
+        free(full_path);
+    }
     // 没找到
     // printf("%s: not found\n", args);
     return 0;
