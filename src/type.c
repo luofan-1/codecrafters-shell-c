@@ -27,11 +27,22 @@
 int search_external(const char *cmd, char **cmd_path) {
     char *path_copy = strdup(ENV_PATH);
     char *dir = strtok(path_copy, PATH_LIST_SEPARATOR);
-    char full_path[256];
+    char *full_path;
     while (dir != NULL) {
         if (dir[strlen(dir)-1] == PATH_SEPARATOR[0]) {
+            if (full_path == NULL) {
+                full_path = (char *)malloc(strlen(dir)+strlen(cmd)+1);
+            } else if (strlen(full_path) < strlen(dir)+strlen(cmd)+1) {
+                full_path = realloc(full_path, strlen(dir)+strlen(cmd)+1);
+            }
             sprintf(full_path, "%s%s", dir, cmd);
         } else {
+            if (full_path == NULL) {
+                full_path = (char *)malloc(strlen(dir)+strlen(PATH_SEPARATOR)+strlen(cmd)+1);
+            } else if (strlen(full_path) < strlen(dir)+strlen(cmd)+1) {
+                full_path = realloc(full_path, strlen(dir)+strlen(PATH_SEPARATOR)+strlen(cmd)+1);
+            }
+            // full_path = (char *)malloc(strlen(dir)+strlen(PATH_SEPARATOR)+strlen(cmd)+1);
             sprintf(full_path, "%s%s%s", dir, PATH_SEPARATOR, cmd);
         }
 
@@ -44,12 +55,17 @@ int search_external(const char *cmd, char **cmd_path) {
             // printf("%s is %s\n", cmd, full_path);
             *cmd_path = full_path;
             return 1;
-        }
+        } 
+        // else {
+        //     free(full_path);
+        // }
         
+
+
         dir = strtok(NULL, PATH_LIST_SEPARATOR);
     }
     free(path_copy);
-
+    free(full_path);
     // 没找到
     // printf("%s: not found\n", args);
     return 0;
