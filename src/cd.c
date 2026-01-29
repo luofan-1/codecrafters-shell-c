@@ -1,6 +1,7 @@
 #include "command_lib.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 
 char *builtin_cd(const char *args) {
     // chdir 在 windows 下依然是用不了的
