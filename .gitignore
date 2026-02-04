@@ -58,3 +58,5 @@ temp/
 make/
 make
 make/*
+
+tests/
