@@ -29,7 +29,7 @@ char *builtin_echo(const char *content) {
             continue;
         }
 
-        if (!quoted || (quoted&&!isblank(content[i]))) {
+        if (quoted || (!quoted && !isblank(content[i]))) {
             putchar(content[i]);
             continue;
         }
