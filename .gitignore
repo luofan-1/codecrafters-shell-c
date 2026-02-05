@@ -54,9 +54,15 @@ dkms.conf
 vcpkg_installed
 
 build
+build/
+/build
+src/make/*
+src/make
 temp/
 make/
 make
 make/*
 
+*.bak
+todo.md
 tests/

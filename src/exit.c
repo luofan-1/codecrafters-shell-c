@@ -6,7 +6,7 @@
 #include <stdnoreturn.h>
 #include <stdlib.h>
 
-char *builtin_exit(const char *args) {
+int builtin_exit(char *const *args) {
     exit(EXIT_SUCCESS);
-    return NULL; // 无意义
+    return 0; // 无意义
 }

@@ -1,3 +1,0 @@
-/mnt/d/projects/codecrafters/codecrafters-shell-c/src/make/build/CMakeFiles/shell.dir
-/mnt/d/projects/codecrafters/codecrafters-shell-c/src/make/build/CMakeFiles/edit_cache.dir
-/mnt/d/projects/codecrafters/codecrafters-shell-c/src/make/build/CMakeFiles/rebuild_cache.dir

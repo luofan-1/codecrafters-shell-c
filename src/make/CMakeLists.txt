@@ -8,6 +8,6 @@ file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/../*.c ${CMAKE_SOURCE_DIR}/../*.h)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
-add_executable(shell ${SOURCE_FILES})
+add_executable(myshell ${SOURCE_FILES})
 
-target_link_libraries(shell PRIVATE readline)
+target_link_libraries(myshell PRIVATE readline)

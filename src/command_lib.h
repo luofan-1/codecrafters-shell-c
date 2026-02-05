@@ -32,35 +32,36 @@ static char cmd_lib[][64] = {
 
 // commands
 // #define TYPE_EXIT "builtin" // 类型宏
-extern char *builtin_exit(const char *args); // 命令主函数
+extern int builtin_exit(char *const *args); // 命令主函数
 // extern void info_exit(); // 帮助函数?
 
 // #define TYPE_ECHO "builtin"
-extern char *builtin_echo(const char *content);
+extern int builtin_echo(char *const *args);
 
 // #define TYPE_TYPE "builtin"
 extern int search_external(const char *cmd, char **cmd_path);
-extern char *builtin_type(const char *args);
+extern int builtin_type(char *const *args);
 #define TYPE(idx) 
 
 // pwd
-extern char *builtin_pwd(const char *args);
+extern int builtin_pwd(char *const *args);
 
 // cd
-extern char *builtin_cd(const char *args);
+extern int builtin_cd(char *const *args);
 
-// 解析我觉得还是要靠一个定的字符指针和偏移量，以后改改
 // parse
 extern int get_idx(const char *cmd);
 extern void invalid_info(const char *cmd);
 extern int command_parse(const char *cmd);
-extern const char *get_idx_and_move(const char *cmd, int *idx_reciever);
+// extern const char *get_idx_and_move(const char *cmd, int *idx_reciever);
 
 // #define GENERIC_FUNC void*
 #define X(name, idx, func) func,
-static char *(*cmd_funcs[])(const char *) = {
+static int(*cmd_funcs[])(char *const *args) = {
     CMD_LINK(X)
 };
+
+
 #undef X
 
 #endif
