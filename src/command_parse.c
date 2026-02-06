@@ -62,6 +62,11 @@ int command_parse(const char *cmd) {
             if (i >= cmd_len) break;
         }
         
+        if (!quoted && !dquoted && cmd[i]=='\\') {
+            processed_cmd[pcmd_len++] = cmd[++i];
+            continue;
+        }
+
         if (!quoted && !dquoted && cmd[i]=='\"') {
             dquoted = 1;
             continue;
