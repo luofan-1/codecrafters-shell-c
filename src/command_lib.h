@@ -60,8 +60,6 @@ extern int command_parse(const char *cmd);
 static int(*cmd_funcs[])(char *const *args) = {
     CMD_LINK(X)
 };
-
-
 #undef X
 
 #endif

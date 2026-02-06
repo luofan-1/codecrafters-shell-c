@@ -51,26 +51,37 @@ int command_parse(const char *cmd) {
     char processed_cmd[cmd_len+1];
     int pcmd_len = 0;
     int quoted = 0;
+    int dquoted = 0;
     // preprocess
     for (int i=0; i<cmd_len; i++) {
-        if (!quoted && isblank(cmd[i])) {
+        if (!dquoted && !quoted && isblank(cmd[i])) {
             if (i != 0) processed_cmd[pcmd_len++] = '\0';
             while (isblank(cmd[i]) && i<cmd_len) {
                 i ++;
             }
             if (i >= cmd_len) break;
         }
+        
+        if (!quoted && !dquoted && cmd[i]=='\"') {
+            dquoted = 1;
+            continue;
+        }
 
-        if (!quoted && cmd[i]=='\'') {
+        if (!quoted && dquoted && cmd[i]=='\"') {
+            dquoted = 0;
+            continue;
+        }
+
+        if (!dquoted && !quoted && cmd[i]=='\'') {
             quoted = 1;
             continue;
         }
-        if (quoted && cmd[i]=='\'') {
+        if (!dquoted && quoted && cmd[i]=='\'') {
             quoted = 0;
             continue;
         }
 
-        if (quoted || (!quoted && !isblank(cmd[i]))) {
+        if (dquoted || quoted || (!dquoted && !quoted && !isblank(cmd[i]))) {
             processed_cmd[pcmd_len++] = cmd[i];
             continue;
         }

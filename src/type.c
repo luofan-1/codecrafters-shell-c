@@ -21,10 +21,21 @@
     #include <unistd.h>
 #endif
 
+// load path: function to be completed
+static int path_is_parsed = 0;
+static char *path_list[128]; // aware: exceeding
+static int path_list_cnt = 0;
 /**
  * @return 能否找到
  */
 int search_external(const char *cmd, char **cmd_path) {
+    
+    if (path_is_parsed) {
+        
+        path_is_parsed = 1;
+        return 1;
+    }
+
     char *path_copy = strdup(ENV_PATH);
     char *dir = strtok(path_copy, PATH_LIST_SEPARATOR);
     char *full_path = NULL;
