@@ -12,7 +12,6 @@ int main(int argc, char *argv[]) {
     printf("PATH = %s\n", ENV_PATH);
     printf("BUILTIN_CNT = %zu\n", BUILTIN_CNT);
 #endif
-
     while (1) {
         printf("$ ");
         fgets(cmd_buff, sizeof(cmd_buff), stdin);
