@@ -50,7 +50,7 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
     if (cmd[*i] == '>') {
         (*i) ++;
         mode = RDRCT_REWRITE;
-        if (cmd[*i+1] == '>') {
+        if (cmd[*i] == '>') {
             mode = RDRCT_APPEND;
             (*i) ++;
         }
@@ -59,6 +59,7 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
         (*i) ++;
     }
     
+    // printf("mode:%d\n", mode);
     // pass blanks
     while (isblank(cmd[*i])) (*i) ++;
 
