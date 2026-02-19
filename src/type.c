@@ -75,7 +75,7 @@ int search_external(const char *cmd, char **cmd_path) {
         sprintf(full_path, "%s%s", path_list[i], cmd);
 
         if (access(full_path, X_OK)==0) {
-            printf("%% accessed %s\n", full_path);
+            // printf("%% accessed %s\n", full_path);
             if (cmd_path != NULL) {
                 *cmd_path = full_path;
             } else if (full_path != NULL) {

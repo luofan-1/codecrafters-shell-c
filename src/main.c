@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
     // Flush after every printf
     setbuf(stdout, NULL);
     
+    // printf("completion mode: %d", );
     rl_attempted_completion_function = complete;
 
     char *cmd;
