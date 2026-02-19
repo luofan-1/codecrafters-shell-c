@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     
     // printf("completion mode: %d", );
     rl_attempted_completion_function = complete;
-
+    
     char *cmd;
     while (1) {
         cmd = readline("$ ");
@@ -40,6 +40,7 @@ char **complete(const char *text, int start, int end) {
     if (start == 0) {
         return complete_commands(text);
     } else {
+        return NULL;
         return complete_paths(text);
     }
 }
@@ -62,6 +63,7 @@ char **complete_commands(const char *prefix) {
     list_cnt += get_externals_by_prefix(list+list_cnt, prefix);
 
     // end
+    if (list_cnt==0) return NULL;
     // list[list_cnt++] = strdup(prefix);
     list[list_cnt] = NULL;
     // printf("list_cnt: %d", list_cnt);
