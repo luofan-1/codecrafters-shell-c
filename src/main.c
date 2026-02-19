@@ -17,7 +17,9 @@ int main(int argc, char *argv[]) {
     
     // printf("completion mode: %d", );
     rl_attempted_completion_function = complete;
-    
+    rl_sort_completion_matches = 1;
+    rl_completion_query_items = 1;
+
     char *cmd;
     while (1) {
         cmd = readline("$ ");
@@ -65,8 +67,10 @@ char **complete_commands(const char *prefix) {
     // end
     if (list_cnt==0) return NULL;
     // list[list_cnt++] = strdup(prefix);
+    qsort(list, list_cnt, sizeof(char *), (int (*)(const void *, const void *))strcmp);
     list[list_cnt] = NULL;
     // printf("list_cnt: %d", list_cnt);
+    // for (int i=0; list[i]!=NULL; i++) printf("%d: %s\n", i, list[i]);
     return list;
 }
 
