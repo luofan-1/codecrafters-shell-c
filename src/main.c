@@ -22,6 +22,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         cmd = readline("$ ");
         command_parse(cmd);
+        free(cmd);
     }
 
     // char cmd_buff[256];
@@ -49,6 +50,7 @@ char **complete_paths(const char *prefix) {
 
 }
 
+// 还没有去重
 char **complete_commands(const char *prefix) {
     // builtins
     int list_cnt = 0;
@@ -65,7 +67,7 @@ char **complete_commands(const char *prefix) {
     // end
     if (list_cnt==0) return NULL;
     // list[list_cnt++] = strdup(prefix);
-    qsort(list, list_cnt, sizeof(char *), (int (*)(const void *, const void *))strcmp);
+    // qsort(list, list_cnt, sizeof(char *), (int (*)(const void *, const void *))strcmp);
     list[list_cnt] = NULL;
     // printf("list_cnt: %d", list_cnt);
     // for (int i=0; list[i]!=NULL; i++) printf("%d: %s\n", i, list[i]);
