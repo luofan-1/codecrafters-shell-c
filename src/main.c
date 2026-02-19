@@ -51,7 +51,7 @@ char **complete_paths(const char *prefix) {
 char **complete_commands(const char *prefix) {
     // builtins
     int list_cnt = 0;
-    char **list = (char **)malloc(sizeof(char *)*256);
+    char **list = (char **)malloc(sizeof(char *)*256); // 越界
     for (int i=0; i<BUILTIN_CNT; i++) {
         if (strstr(cmd_lib[i], prefix) == cmd_lib[i]) {
             list[list_cnt++] = strdup(cmd_lib[i]);
@@ -62,7 +62,9 @@ char **complete_commands(const char *prefix) {
     list_cnt += get_externals_by_prefix(list+list_cnt, prefix);
 
     // end
+    // list[list_cnt++] = strdup(prefix);
     list[list_cnt] = NULL;
+    // printf("list_cnt: %d", list_cnt);
     return list;
 }
 
