@@ -1,23 +1,105 @@
 #include "command_lib.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <readline/readline.h>
+
+int get_externals_by_prefix(char **externals, const char *prefix);
+char **complete_commands(const char *prefix);
+char **complete_paths(const char *prefix);
+char **complete(const char *text, int start, int end);
 
 int main(int argc, char *argv[]) {
     // Flush after every printf
-    ENV_PATH = getenv("PATH");
     setbuf(stdout, NULL);
-    char cmd_buff[256];
+    
+    rl_attempted_completion_function = complete;
 
-#ifndef NDEBUG
-    printf("PATH = %s\n", ENV_PATH);
-    printf("BUILTIN_CNT = %zu\n", BUILTIN_CNT);
-#endif
+    char *cmd;
     while (1) {
-        printf("$ ");
-        fgets(cmd_buff, sizeof(cmd_buff), stdin);
-        cmd_buff[strlen(cmd_buff) - 1] = '\0';
-        command_parse(cmd_buff);
+        cmd = readline("$ ");
+        command_parse(cmd);
     }
 
+    // char cmd_buff[256];
+    // while (1) {
+    //     printf("$ ");
+    //     fgets(cmd_buff, sizeof(cmd_buff), stdin);
+    //     cmd_buff[strlen(cmd_buff) - 1] = '\0';
+    //     command_parse(cmd_buff);
+    // }
+
     return 0;
+}
+
+char **complete(const char *text, int start, int end) {
+    (void)end;
+    if (start == 0) {
+        return complete_commands(text);
+    } else {
+        return complete_paths(text);
+    }
+}
+
+char **complete_paths(const char *prefix) {
+
+}
+
+char **complete_commands(const char *prefix) {
+    // builtins
+    int list_cnt = 0;
+    char **list = (char **)malloc(sizeof(char *)*256);
+    for (int i=0; i<BUILTIN_CNT; i++) {
+        if (strstr(cmd_lib[i], prefix) == cmd_lib[i]) {
+            list[list_cnt++] = strdup(cmd_lib[i]);
+        }
+    }
+
+    // externals
+    list_cnt += get_externals_by_prefix(list+list_cnt, prefix);
+
+    // end
+    list[list_cnt] = NULL;
+    return list;
+}
+
+
+// @return 返回找到的命令数
+int get_externals_by_prefix(char **externals, const char *prefix) {
+    parse_path();
+    DIR *cur_dir = NULL;
+    struct dirent *cur_file = NULL;
+    int ext_cnt = 0;
+    char *full_path = NULL;
+    int full_path_capacity = 0;
+    for (int i=0; i<path_list_cnt; i++) {
+        cur_dir = opendir(path_list[i]);
+        cur_file = readdir(cur_dir);
+        while (cur_file != NULL) {
+            if (strstr(cur_file->d_name, prefix)==cur_file->d_name) {
+                // 扩容
+                int required_capacity = strlen(path_list[i])+strlen(cur_file->d_name)+1;
+                if (full_path == NULL) {
+                    full_path = (char *)malloc(required_capacity);
+                    full_path_capacity = required_capacity;
+                } else if (required_capacity > full_path_capacity) {
+                    full_path = (char *)realloc(full_path, required_capacity);
+                    full_path_capacity = required_capacity;
+                }
+                // 复制
+                strcpy(full_path, path_list[i]);
+                strcat(full_path, cur_file->d_name);
+                // 访问
+                if (access(full_path, X_OK)==0) {
+                    externals[ext_cnt++] = strdup(cur_file->d_name);
+                }
+            }
+            cur_file = readdir(cur_dir);
+        }
+        closedir(cur_dir);
+    }
+    if (full_path!=NULL) free(full_path);
+    return ext_cnt;
 }

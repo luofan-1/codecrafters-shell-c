@@ -1,11 +1,8 @@
 #include "command_lib.h"
+#include <stdlib.h>
 
-const char *ENV_PATH;
-
-#ifdef _WIN32
-const char *PATH_LIST_SEPARATOR = ";";
-const char *PATH_SEPARATOR      = "\\";
-#else
-const char *PATH_LIST_SEPARATOR = ":";
-const char *PATH_SEPARATOR      = "/";
-#endif
+char *ENV_PATH = NULL;
+int path_is_parsed = 0;
+char **path_list = NULL;
+int path_list_cnt = 0;
+int path_list_capacity = 128;

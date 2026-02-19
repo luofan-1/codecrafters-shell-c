@@ -6,10 +6,19 @@
 #include <stdlib.h>
 #include <stdnoreturn.h>
 
-
-extern const char *ENV_PATH;
-extern const char *PATH_SEPARATOR;
-extern const char *PATH_LIST_SEPARATOR; 
+#ifdef _WIN32
+#define PATH_SEPARATOR "\\"
+#define PATH_LIST_SEPARATOR ";"
+#else
+#define PATH_SEPARATOR "/"
+#define PATH_LIST_SEPARATOR ":" 
+#endif // _WIN32
+// env
+extern char *ENV_PATH;
+extern int path_is_parsed;
+extern char **path_list;
+extern int path_list_capacity;
+extern int path_list_cnt;
 
 // 感觉以后用树或者哈希表什么的来替代线性查找会更好一点
 #define CMD_LINK(X) \
@@ -40,6 +49,7 @@ extern int builtin_echo(char *const *args);
 
 // #define TYPE_TYPE "builtin"
 extern int search_external(const char *cmd, char **cmd_path);
+extern int parse_path();
 extern int builtin_type(char *const *args);
 #define TYPE(idx) 
 

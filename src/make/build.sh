@@ -5,9 +5,9 @@ BUILD_DIR="build"
 
 # 检查并删除 build 目录（对应原批处理的 rd /s /q）
 if [ -d "$BUILD_DIR" ]; then
-    echo "removing build"
-    rm -rf "$BUILD_DIR"  # -r 递归删除目录，-f 强制删除（无提示）
-    echo "build removed"
+#    echo "removing build"
+#    rm -rf "$BUILD_DIR"  # -r 递归删除目录，-f 强制删除（无提示）
+#    echo "build removed"
 else
     echo "build not found"
 fi
