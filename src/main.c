@@ -17,8 +17,6 @@ int main(int argc, char *argv[]) {
     
     // printf("completion mode: %d", );
     rl_attempted_completion_function = complete;
-    rl_sort_completion_matches = 1;
-    rl_completion_query_items = 1;
 
     char *cmd;
     while (1) {
