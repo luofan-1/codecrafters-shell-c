@@ -27,23 +27,6 @@ inline void invalid_info(const char *cmd) {
     printf("%s: command not found\n", cmd);
 }
 
-// #define redirect(filename, mode, code) do { \
-//     switch (code) { \
-//         case 0: freopen((filename), (mode), stdin); break; \
-//         case 1: freopen((filename), (mode), stdout); break; \
-//         case 2: freopen((filename), (mode), stderr); break; \
-//     } \
-// } while(0)
-
-// #define disredirect(code) do { \
-//     if (code != -1) { \
-//         switch (code) { \
-//             case 0: fclose(stdin); freopen(NULL, "r", stdin); break; \
-//             case 1: fclose(stdout); freopen(NULL, "w", stdout); break; \
-//             case 2: fclose(stderr); freopen(NULL, "w", stderr); break; \
-//         } \
-//     } \
-// } while(0)
 /**
  * @return 成功则返回1, 失败则返回0
  */
@@ -57,18 +40,15 @@ int command_parse(const char *cmd) {
     int pcmd_len = 0;
     int quoted = 0;
     int dquoted = 0;
-    int redirected = 0;
-
+    int redirect_pid = -2;
+    int pipe_fds[2];
+    int pipe_out_pid=-2, pipe_in_pid=-2;
     // preprocess
     for (int i=0; i<cmd_len; i++) {
 
         // processing quotes and backslashs
         if (!dquoted && !quoted && isblank(cmd[i])) {
-            if (i != 0) processed_cmd[pcmd_len++] = '\0';
-//             if (redirect_code != -1) {
-//                 redirect(redirect_path, "w", redirect_code);
-//                 break;
-//             }
+            if (pcmd_len != 0) processed_cmd[pcmd_len++] = '\0';
             while (isblank(cmd[i]) && i<cmd_len) {
                 i ++;
             }
@@ -95,13 +75,46 @@ int command_parse(const char *cmd) {
             continue;
         }
 
-
+        // deal with redirections
         if (!quoted && !dquoted && (cmd[i]=='>' || cmd[i]=='<')) {
-            parse_rdrct(processed_cmd, &pcmd_len, cmd, &i);
-            redirected = 1;
-            break;
+            redirect_pid = fork();
+            if (redirect_pid == 0) {
+                parse_redirect(processed_cmd, &pcmd_len, cmd, &i);
+                break;
+            }
+            waitpid(redirect_pid, NULL, 0);
+            return 1;
         }
         
+        // pipes
+        if (!quoted && !dquoted && cmd[i]=='|') {
+            pipe(pipe_fds);
+
+            pipe_out_pid = fork();
+            if (pipe_out_pid == 0) {
+                // printf("outputing\n");
+                close(pipe_fds[0]);
+                dup2(pipe_fds[1], STDOUT_FILENO);
+                break;
+            }
+
+            pipe_in_pid = fork();
+            if (pipe_in_pid == 0) {
+                // printf("inputing\n");
+                close(pipe_fds[1]);
+                dup2(pipe_fds[0], STDIN_FILENO);
+                pcmd_len = 0;
+                continue;
+            }
+            
+            close(pipe_fds[0]);
+            close(pipe_fds[1]);
+
+            waitpid(pipe_out_pid, NULL, 0);
+            waitpid(pipe_in_pid, NULL, 0);
+            return 1;
+        }
+
         // normal characters
         if (dquoted || quoted || (!dquoted && !quoted && !isblank(cmd[i]))) {
             processed_cmd[pcmd_len++] = cmd[i];
@@ -112,11 +125,6 @@ int command_parse(const char *cmd) {
         processed_cmd[pcmd_len] = '\0';
         pcmd_len ++;
     }
-
-//     if (cmd[cmd_len-1]!=' ') {
-//         processed_cmd[pcmd_len] = '\0';
-//         pcmd_len ++;
-//     }
     
     // handle with void cmd
     if (strlen(processed_cmd) == 0) {
@@ -135,6 +143,19 @@ int command_parse(const char *cmd) {
     }
     args[args_cnt] = NULL;
     
+    // if (pipe_in_pid == 0) {
+    //     printf("inputing\n");
+    //     for(int i=0; args[i]!=NULL; i++) {
+    //         printf("&&%s&&\n", args[i]);
+    //     }
+    // }
+    // if (pipe_out_pid == 0) {
+    //     printf("outputing\n");
+    //     for(int i=0; args[i]!=NULL; i++) {
+    //         printf("^^%s^^\n", args[i]);
+    //     }
+    // }
+
 // #define DEBUG_PARSE_133
 #ifdef DEBUG_PARSE_133
     int i_133 = 0;
@@ -156,14 +177,15 @@ int command_parse(const char *cmd) {
         invalid_info(args[0]);
         return 0;
     }
-    int fork_ret;
-    if (fork() == 0) {
+    int external_executing_pid = fork();
+    if (external_executing_pid == 0) {
         execvp(args[0], args);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
-    wait(&fork_ret);
+    waitpid(external_executing_pid, NULL, 0);
 
-    static int counting = 0;
+    
+
 end_success:
     // end
     for (int i=0; args[i]!=NULL; i++) {
@@ -171,8 +193,16 @@ end_success:
         args[i] = NULL;
     }
 
-    if (redirected) {
-        reset_fd(); 
+    if (redirect_pid == 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    if (pipe_out_pid == 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    if (pipe_in_pid == 0) {
+        exit(EXIT_SUCCESS);
     }
     return 1;
 }

@@ -5,22 +5,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#define RDRCT_REWRITE 0
-#define RDRCT_APPEND  1
-#define RDRCT_READ    2
+#define REDIRECT_REWRITE 0
+#define REDIRECT_APPEND  1
+#define REDIRECT_READ    2
 
-
-int stdio_fds[] = {
-    0, // stdin
-    1, // stdout
-    2, // stderr
-};
-// int stdin_fd = 0;
-// int stdout_fd = 1;
-// int stderr_fd = 2;
-
-int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
-    int rdrct_fd = 0;
+int parse_redirect(char *pcmd, int *len, const char *cmd, int *i) {
+    int redirect_fd;
     int base = 1;
     int has_fd = 0;
 
@@ -28,11 +18,10 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
     int last_end = *len;
     while (last_end-1>=0 && isdigit(pcmd[last_end-1])) {
         has_fd = 1;
-        rdrct_fd += base*(pcmd[last_end-1]-'0');
+        redirect_fd += base*(pcmd[last_end-1]-'0');
         last_end --;
         base *= 10;
     }
-    if (!has_fd) rdrct_fd = 1;
 
     // handle with pcmd_len
     if (pcmd[last_end-1]=='\0') {
@@ -49,13 +38,15 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
     int mode;
     if (cmd[*i] == '>') {
         (*i) ++;
-        mode = RDRCT_REWRITE;
+        mode = REDIRECT_REWRITE;
+        if (!has_fd) redirect_fd = 1;
         if (cmd[*i] == '>') {
-            mode = RDRCT_APPEND;
+            mode = REDIRECT_APPEND;
             (*i) ++;
         }
     } else {
-        mode = RDRCT_READ;
+        if (!has_fd) redirect_fd = 2;
+        mode = REDIRECT_READ;
         (*i) ++;
     }
     
@@ -64,7 +55,7 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
     while (isblank(cmd[*i])) (*i) ++;
 
     // parse redirect path
-    char rdrct_path[strlen(cmd+(*i))+1];
+    char redirect_path[strlen(cmd+(*i))+1];
     int path_len = 0;
     int quoted = 0;
     int dquoted = 0;
@@ -92,54 +83,41 @@ int parse_rdrct(char *pcmd, int *len, const char *cmd, int *i) {
 
         if (!quoted && cmd[*i]=='\\') {
             (*i) ++;
-            rdrct_path[path_len++] = cmd[*i];
+            redirect_path[path_len++] = cmd[*i];
             goto while_next1;
         }
 
-        rdrct_path[path_len++] = cmd[*i];
+        redirect_path[path_len++] = cmd[*i];
 
 while_next1:
         (*i) ++;
     }
-    rdrct_path[path_len] = '\0';
+    redirect_path[path_len] = '\0';
 
     
     int ret = 0;
-    ret = do_redirect(rdrct_path, rdrct_fd, mode);
-    // '\0'-12ada>ada 
-    // '\0'-12ada12>ada 
-    // ada'\0'->ada 
-    // ada'\0'-12>ada 
+    ret = do_redirect(redirect_path, redirect_fd, mode);
     return ret;
 }
 
 int do_redirect(const char *filename, int fd, int mode) {
     int newfd = -1;
     switch (mode) {
-        case RDRCT_REWRITE:
+        case REDIRECT_REWRITE:
             newfd = open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0664);
             break;
-        case RDRCT_APPEND:
+        case REDIRECT_APPEND:
             newfd = open(filename, O_WRONLY|O_CREAT|O_APPEND, 0664);
             break;
-        case RDRCT_READ:
+        case REDIRECT_READ:
+            newfd = open(filename, O_RDONLY);
             break;
     }
     if (newfd == -1) return 0;
-    stdio_fds[fd] = dup(fd);
+
     dup2(newfd, fd);
     close(newfd);
     return 1;
 }
 
 
-// ??? 
-int reset_fd() {
-    for (int i=0; i<3; i++) {
-        if (stdio_fds[i] == i) continue;
-        dup2(stdio_fds[i], i);
-        close(stdio_fds[i]);
-        stdio_fds[i] = i;
-    }
-    return 1;
-}

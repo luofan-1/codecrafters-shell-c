@@ -2,23 +2,25 @@
 #include "interactions.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
 
-static char *completion_list[256];
+static char **completion_list = NULL;
+static int completion_list_capacity = 128;
 static int completion_list_cnt = 0;
 
 static char *generate_command(const char *text, int state);
 static int list_commands(const char *prefix);
-static int get_externals_by_prefix(char **externals, const char *prefix);
+static int get_externals_by_prefix(const char *prefix);
 
 void shell_init() {
     setbuf(stdout, NULL);
-
     // readline 相关
     rl_attempted_completion_function = complete;
+    completion_list = (char **)malloc(sizeof(char *)*completion_list_capacity);
 }
 
 char *cmd_gets() {
@@ -57,12 +59,16 @@ static int list_commands(const char *prefix) {
     // builtins
     for (int i=0; i<BUILTIN_CNT; i++) {
         if (strncmp(cmd_lib[i], prefix, strlen(prefix))==0) {
+            if (completion_list_cnt >= completion_list_capacity) {
+                completion_list_capacity *= 2;
+                completion_list = realloc(completion_list, sizeof(char *)*completion_list_capacity);
+            }
             completion_list[completion_list_cnt++] = strdup(cmd_lib[i]);
         }
     }
 
     // externals
-    completion_list_cnt += get_externals_by_prefix(completion_list+completion_list_cnt, prefix);
+    get_externals_by_prefix(prefix);
 
     // end
     if (completion_list_cnt != 0)
@@ -75,12 +81,10 @@ static int list_commands(const char *prefix) {
 }
 
 
-// @return 返回找到的命令数
-static int get_externals_by_prefix(char **externals, const char *prefix) {
+static int get_externals_by_prefix(const char *prefix) {
     parse_path();
     DIR *cur_dir = NULL;
     struct dirent *cur_file = NULL;
-    int ext_cnt = 0;
     char *full_path = NULL;
     int full_path_capacity = 0;
     for (int i=0; i<path_list_cnt; i++) {
@@ -102,7 +106,12 @@ static int get_externals_by_prefix(char **externals, const char *prefix) {
                 strcat(full_path, cur_file->d_name);
                 // 访问
                 if (access(full_path, X_OK)==0) {
-                    externals[ext_cnt++] = strdup(cur_file->d_name);
+                    // 扩容
+                    if (completion_list_cnt >= completion_list_capacity) {
+                        completion_list_capacity *= 2;
+                        completion_list = realloc(completion_list, sizeof(char *)*completion_list_capacity);
+                    }
+                    completion_list[completion_list_cnt++] = strdup(cur_file->d_name);
                 }
             }
             cur_file = readdir(cur_dir);
@@ -110,5 +119,5 @@ static int get_externals_by_prefix(char **externals, const char *prefix) {
         closedir(cur_dir);
     }
     if (full_path!=NULL) free(full_path);
-    return ext_cnt;
+    return 1;
 }
