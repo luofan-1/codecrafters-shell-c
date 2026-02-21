@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "readline/history.h"
 
+// abandoned
 static int read_history_from_file(const char *filename) {
     FILE *fp = fopen(filename, "r");
     assert(fp != NULL);
@@ -20,6 +21,7 @@ static int read_history_from_file(const char *filename) {
     return history_cnt;
 }
 
+
 int builtin_history(char *const *args) {
     int ret = 1;
     HIST_ENTRY **list = history_list();
@@ -27,7 +29,11 @@ int builtin_history(char *const *args) {
     if (args[1] != NULL) {
         if (strcmp(args[1], "-r")==0) {
             assert(args[2]!=NULL);
-            read_history_from_file(args[2]);
+            read_history(args[2]);
+            return 1;
+        } else if (strcmp(args[1], "-w")==0) {
+            assert(args[2]!=NULL);
+            write_history(args[2]);
             return 1;
         }
         output_history_num = 0;
