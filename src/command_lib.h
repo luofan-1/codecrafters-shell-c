@@ -15,6 +15,7 @@
 #endif // _WIN32
 // env
 extern char *ENV_PATH;
+extern char *ENV_HISTFILE;
 extern int path_is_parsed;
 extern char **path_list;
 extern int path_list_capacity;

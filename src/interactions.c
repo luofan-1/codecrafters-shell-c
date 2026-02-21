@@ -21,8 +21,8 @@ void shell_init() {
     // readline 相关
     rl_attempted_completion_function = complete;
     completion_list = (char **)malloc(sizeof(char *)*completion_list_capacity);
-    char *env_histfile = getenv("HISTFILE");
-    read_history(env_histfile);
+    ENV_HISTFILE = getenv("HISTFILE");
+    read_history(ENV_HISTFILE);
 }
 
 char *cmd_gets() {
