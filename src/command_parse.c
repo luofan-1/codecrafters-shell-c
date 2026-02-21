@@ -42,9 +42,11 @@ int command_parse(const char *cmd) {
     int quoted = 0;
     int dquoted = 0;
     pid_t redirect_pid = -2;
+    int is_redirected_child_process = 0;
     int pipe_fds[2];
     pid_t pipe_out_pid=-2, pipe_in_pid=-2;
     int is_pipe_child_process = 0;
+    int args_used = 0;
 
     // preprocess
     for (int i=0; i<cmd_len; i++) {
@@ -82,6 +84,7 @@ int command_parse(const char *cmd) {
         if (!quoted && !dquoted && (cmd[i]=='>' || cmd[i]=='<')) {
             redirect_pid = fork();
             if (redirect_pid == 0) {
+                is_redirected_child_process = 1;
                 parse_redirect(processed_cmd, &pcmd_len, cmd, &i);
                 break;
             }
@@ -131,11 +134,11 @@ int command_parse(const char *cmd) {
     
     // handle with void cmd
     if (strlen(processed_cmd) == 0) {
-        return 1;
+        goto end_success;
     }
 
     // split args
-    char *args[64];
+    char *args[64] = {0};
     int args_cnt = 0;
     const char *pcmd_ptr = processed_cmd;
     int len_cnt = 0;
@@ -145,16 +148,7 @@ int command_parse(const char *cmd) {
         pcmd_ptr += strlen(pcmd_ptr)+1;
     }
     args[args_cnt] = NULL;
-    
-
-// #define DEBUG_PARSE_133
-#ifdef DEBUG_PARSE_133
-    int i_133 = 0;
-    while (args[i_133]!=NULL) {
-        printf("%sed\n", args[i_133]);
-        i_133 ++;
-    }
-#endif
+    args_used = 1;
 
     // builtins
     int cmd_idx = get_idx(args[0]);
@@ -162,11 +156,12 @@ int command_parse(const char *cmd) {
         (void)cmd_funcs[cmd_idx](args);
         goto end_success;
     }
+    
 
     // externals
     if (!search_external(args[0], NULL)) {
         invalid_info(args[0]);
-        return 0;
+        goto end_fail;
     }
     int external_executing_pid = fork();
     if (external_executing_pid == 0) {
@@ -174,17 +169,19 @@ int command_parse(const char *cmd) {
         exit(EXIT_SUCCESS);
     }
     waitpid(external_executing_pid, NULL, 0);
-
+    goto end_success;
     
-
-end_success:
     // end
-    for (int i=0; args[i]!=NULL; i++) {
-        free(args[i]);
-        args[i] = NULL;
+end_success:
+    
+    if (args_used) {
+        for (int i=0; args[i]!=NULL; i++) {
+            free(args[i]);
+            args[i] = NULL;
+        }
     }
 
-    if (redirect_pid == 0) {
+    if (is_redirected_child_process) {
         exit(EXIT_SUCCESS);
     }
     
@@ -192,12 +189,22 @@ end_success:
         exit(EXIT_SUCCESS);
     }
 
-    // if (pipe_out_pid == 0) {
-    //     exit(EXIT_SUCCESS);
-    // }
-
-    // if (pipe_in_pid == 0) {
-    //     exit(EXIT_SUCCESS);
-    // }
     return 1;
+
+end_fail:
+    if (args_used) {
+        for (int i=0; args[i]!=NULL; i++) {
+            free(args[i]);
+            args[i] = NULL;
+        }
+    }
+
+    if (is_redirected_child_process) {
+        exit(EXIT_FAILURE);
+    }
+    
+    if (is_pipe_child_process) {
+        exit(EXIT_FAILURE);
+    }
+    return 0;
 }
