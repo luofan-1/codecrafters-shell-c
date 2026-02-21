@@ -22,11 +22,12 @@ extern int path_list_cnt;
 
 // 感觉以后用树或者哈希表什么的来替代线性查找会更好一点
 #define CMD_LINK(X) \
-    X("exit", 0, builtin_exit) \
-    X("echo", 1, builtin_echo) \
-    X("type", 2, builtin_type) \
-    X("pwd",  3, builtin_pwd ) \
-    X("cd",   4, builtin_cd  )
+    X("exit",    0, builtin_exit) \
+    X("echo",    1, builtin_echo) \
+    X("type",    2, builtin_type) \
+    X("pwd",     3, builtin_pwd ) \
+    X("cd",      4, builtin_cd  ) \
+    X("history", 5, builtin_history)
 
 
 // 命令列表(有点想把这个东西搞到外部去，这样以后添加命令会不会更方便一点？)
@@ -59,13 +60,14 @@ extern int builtin_pwd(char *const *args);
 // cd
 extern int builtin_cd(char *const *args);
 
+// history
+extern int builtin_history(char *const *args);
+
 // parse
 extern int get_idx(const char *cmd);
 extern void invalid_info(const char *cmd);
 extern int command_parse(const char *cmd);
-// extern const char *get_idx_and_move(const char *cmd, int *idx_reciever);
 
-// #define GENERIC_FUNC void*
 #define X(name, idx, func) func,
 static int(*cmd_funcs[])(char *const *args) = {
     CMD_LINK(X)
