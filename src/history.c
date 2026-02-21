@@ -1,15 +1,35 @@
 #include "command_lib.h"
+#include <assert.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <unistd.h>
 #include "readline/history.h"
+
+static int read_history_from_file(const char *filename) {
+    FILE *fp = fopen(filename, "r");
+    assert(fp != NULL);
+    
+    int history_cnt = 0;
+    char buf[256];
+    while (fgets(buf, sizeof(buf), fp)!=NULL) {
+        buf[strlen(buf)-1] = '\0';
+        if (buf[0]!='\0') add_history(buf);
+        history_cnt ++;
+    }
+    return history_cnt;
+}
 
 int builtin_history(char *const *args) {
     int ret = 1;
     HIST_ENTRY **list = history_list();
-    if (list == NULL) return 0;
     int output_history_num = history_length;
     if (args[1] != NULL) {
+        if (strcmp(args[1], "-r")==0) {
+            assert(args[2]!=NULL);
+            read_history_from_file(args[2]);
+            return 1;
+        }
         output_history_num = 0;
         int len_limit = strlen(args[1]);
         for (int i=0; i<len_limit; i++) {
