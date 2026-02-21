@@ -12,7 +12,7 @@ int builtin_exit(char *const *args) {
         free(path_list[i]);
     }
     free(path_list);
-    write_history(ENV_HISTFILE);
+    append_history(history_length, ENV_HISTFILE);
     exit(EXIT_SUCCESS);
     return 0; // 无意义
 }
