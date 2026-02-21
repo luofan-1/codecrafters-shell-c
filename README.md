@@ -1,3 +1,25 @@
+> 来源：[Build your own Shell | CodeCrafters](https://app.codecrafters.io/courses/shell/overview)
+>
+> 完成日期：2026 / 2 / 21
+
+环境：Linux 24.04  （Windows 下大部分功能不可用）
+
+依赖：GNU Readline 库
+
+```shell
+sudo apt install libreadline-dev
+```
+
+构建：
+
+```shell
+$ cd ./src/make/      # 切换目录
+$ ./build.sh          # 构建
+$ ./build/bin/myshell # 运行
+```
+
+codecrafters-shell-c 目录下的 CmakeLists.txt 为网站评测所用
+
 [![progress-banner](https://backend.codecrafters.io/progress/shell/ae79f394-8776-4ae8-a66c-dbf617186d5e)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for C solutions to the
