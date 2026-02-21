@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <threads.h>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -40,9 +41,11 @@ int command_parse(const char *cmd) {
     int pcmd_len = 0;
     int quoted = 0;
     int dquoted = 0;
-    int redirect_pid = -2;
+    pid_t redirect_pid = -2;
     int pipe_fds[2];
-    int pipe_out_pid=-2, pipe_in_pid=-2;
+    pid_t pipe_out_pid=-2, pipe_in_pid=-2;
+    int is_pipe_child_process = 0;
+
     // preprocess
     for (int i=0; i<cmd_len; i++) {
 
@@ -83,7 +86,7 @@ int command_parse(const char *cmd) {
                 break;
             }
             waitpid(redirect_pid, NULL, 0);
-            return 1;
+            goto end_success;
         }
         
         // pipes
@@ -92,6 +95,7 @@ int command_parse(const char *cmd) {
 
             pipe_out_pid = fork();
             if (pipe_out_pid == 0) {
+                is_pipe_child_process = 1;
                 close(pipe_fds[0]);
                 dup2(pipe_fds[1], STDOUT_FILENO);
                 break;
@@ -99,6 +103,7 @@ int command_parse(const char *cmd) {
 
             pipe_in_pid = fork();
             if (pipe_in_pid == 0) {
+                is_pipe_child_process = 1;
                 close(pipe_fds[1]);
                 dup2(pipe_fds[0], STDIN_FILENO);
                 pcmd_len = 0;
@@ -110,7 +115,7 @@ int command_parse(const char *cmd) {
 
             waitpid(pipe_out_pid, NULL, 0);
             waitpid(pipe_in_pid, NULL, 0);
-            return 1;
+            goto end_success;
         }
 
         // normal characters
@@ -182,13 +187,17 @@ end_success:
     if (redirect_pid == 0) {
         exit(EXIT_SUCCESS);
     }
-
-    if (pipe_out_pid == 0) {
+    
+    if (is_pipe_child_process) {
         exit(EXIT_SUCCESS);
     }
 
-    if (pipe_in_pid == 0) {
-        exit(EXIT_SUCCESS);
-    }
+    // if (pipe_out_pid == 0) {
+    //     exit(EXIT_SUCCESS);
+    // }
+
+    // if (pipe_in_pid == 0) {
+    //     exit(EXIT_SUCCESS);
+    // }
     return 1;
 }
