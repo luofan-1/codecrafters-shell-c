@@ -35,6 +35,9 @@ int builtin_history(char *const *args) {
             assert(args[2]!=NULL);
             write_history(args[2]);
             return 1;
+        } else if (strcmp(args[1], "-a")==0) {
+            assert(args[2]!=NULL);
+            append_history(history_length, args[2]);
         }
         output_history_num = 0;
         int len_limit = strlen(args[1]);
