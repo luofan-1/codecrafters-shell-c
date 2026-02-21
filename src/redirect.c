@@ -10,7 +10,7 @@
 #define REDIRECT_READ    2
 
 int parse_redirect(char *pcmd, int *len, const char *cmd, int *i) {
-    int redirect_fd;
+    int redirect_fd = 0;
     int base = 1;
     int has_fd = 0;
 
@@ -45,7 +45,7 @@ int parse_redirect(char *pcmd, int *len, const char *cmd, int *i) {
             (*i) ++;
         }
     } else {
-        if (!has_fd) redirect_fd = 2;
+        if (!has_fd) redirect_fd = 0;
         mode = REDIRECT_READ;
         (*i) ++;
     }

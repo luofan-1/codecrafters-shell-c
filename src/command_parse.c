@@ -92,7 +92,6 @@ int command_parse(const char *cmd) {
 
             pipe_out_pid = fork();
             if (pipe_out_pid == 0) {
-                // printf("outputing\n");
                 close(pipe_fds[0]);
                 dup2(pipe_fds[1], STDOUT_FILENO);
                 break;
@@ -100,7 +99,6 @@ int command_parse(const char *cmd) {
 
             pipe_in_pid = fork();
             if (pipe_in_pid == 0) {
-                // printf("inputing\n");
                 close(pipe_fds[1]);
                 dup2(pipe_fds[0], STDIN_FILENO);
                 pcmd_len = 0;
@@ -143,18 +141,6 @@ int command_parse(const char *cmd) {
     }
     args[args_cnt] = NULL;
     
-    // if (pipe_in_pid == 0) {
-    //     printf("inputing\n");
-    //     for(int i=0; args[i]!=NULL; i++) {
-    //         printf("&&%s&&\n", args[i]);
-    //     }
-    // }
-    // if (pipe_out_pid == 0) {
-    //     printf("outputing\n");
-    //     for(int i=0; args[i]!=NULL; i++) {
-    //         printf("^^%s^^\n", args[i]);
-    //     }
-    // }
 
 // #define DEBUG_PARSE_133
 #ifdef DEBUG_PARSE_133
