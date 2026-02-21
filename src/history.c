@@ -38,6 +38,7 @@ int builtin_history(char *const *args) {
         } else if (strcmp(args[1], "-a")==0) {
             assert(args[2]!=NULL);
             append_history(history_length, args[2]);
+            clear_history();
             return 1;
         }
         output_history_num = 0;
