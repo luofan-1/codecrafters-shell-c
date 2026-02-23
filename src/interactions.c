@@ -1,5 +1,6 @@
-#include "command_lib.h"
-#include "interactions.h"
+#include "includes/builtins.h"
+#include "includes/env.h"
+#include "includes/interactions.h"
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <stdlib.h>
@@ -21,8 +22,8 @@ void shell_init() {
     // readline 相关
     rl_attempted_completion_function = complete;
     completion_list = (char **)malloc(sizeof(char *)*completion_list_capacity);
-    ENV_HISTFILE = getenv("HISTFILE");
-    read_history(ENV_HISTFILE);
+    env_histfile = getenv("HISTFILE");
+    read_history(env_histfile);
 }
 
 char *cmd_gets() {

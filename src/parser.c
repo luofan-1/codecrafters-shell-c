@@ -1,11 +1,11 @@
-#include "command_lib.h"
-#include "redirect.h"
+#include "includes/parser.h"
+#include "includes/builtins.h"
+#include "includes/redirect.h"
+#include "includes/env.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <threads.h>
 
 #ifndef _WIN32
 #include <unistd.h>

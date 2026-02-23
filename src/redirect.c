@@ -1,9 +1,8 @@
-#include "redirect.h"
+#include "includes/redirect.h"
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdio.h>
 
 #define REDIRECT_REWRITE 0
 #define REDIRECT_APPEND  1

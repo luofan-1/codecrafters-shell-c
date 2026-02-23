@@ -2,10 +2,9 @@
  * builtin echo
  */
 
-#include "command_lib.h"
+#include "../includes/builtins.h"
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
 int builtin_echo(char *const *args) {
     int cnt = 1;

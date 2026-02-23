@@ -1,6 +1,7 @@
-#include "command_lib.h"
-#include "interactions.h"
+#include "includes/parser.h"
+#include "includes/interactions.h"
 #include <readline/readline.h>
+#include <stdlib.h>
 
 
 int main(int argc, char *argv[]) {

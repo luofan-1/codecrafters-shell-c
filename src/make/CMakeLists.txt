@@ -4,7 +4,11 @@ project(codecrafter-shell C)
 
 set(CMAKE_C_STANDARD 99) # Enable the C23 standard
 
-file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/../*.c ${CMAKE_SOURCE_DIR}/../builtins/*.c ${CMAKE_SOURCE_DIR}/../*.h)
+set(SRC_DIR ${CMAKE_SOURCE_DIR}/..)
+
+set(HEADS_DIR ${CMAKE_SOURCE_DIR}/../includes/*.h)
+
+file(GLOB SOURCE_FILES ${SRC_DIR}/*.c ${SRC_DIR}/builtins/*.c ${HEADS_DIR})
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 

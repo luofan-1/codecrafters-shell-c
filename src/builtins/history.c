@@ -1,26 +1,10 @@
-#include "command_lib.h"
+#include "../includes/builtins.h"
 #include <assert.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "readline/history.h"
-
-// abandoned
-static int read_history_from_file(const char *filename) {
-    FILE *fp = fopen(filename, "r");
-    assert(fp != NULL);
-    
-    int history_cnt = 0;
-    char buf[256];
-    while (fgets(buf, sizeof(buf), fp)!=NULL) {
-        buf[strlen(buf)-1] = '\0';
-        if (buf[0]!='\0') add_history(buf);
-        history_cnt ++;
-    }
-    return history_cnt;
-}
-
 
 int builtin_history(char *const *args) {
     int ret = 1;
